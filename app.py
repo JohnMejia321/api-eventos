@@ -90,12 +90,7 @@ def get_events():
     except Exception as e:
         return f'Error al obtener eventos desde la base de datos: {str(e)}', 500
 
-@app.route('/events/<int:event_id>', methods=['GET'])
-def get_event_by_id(event_id):
-    event = next((event for event in events if event['id'] == event_id), None)
-    if event:
-        return jsonify(event), 200
-    return "Evento no encontrado", 404
+
 
 # Ruta para agregar un evento a la base de datos
 @app.route('/events', methods=['POST'])
@@ -114,9 +109,35 @@ def create_event():
         db.session.add(nuevo_evento)
         db.session.commit()
 
-        return f'Evento agregado con ID: {nuevo_evento.id}', 201
+        respuesta = {'mensaje': f'Evento agregado con ID: {nuevo_evento.id}'}
+        return jsonify(respuesta), 201
     except Exception as e:
-        return f'Error al agregar el evento: {str(e)}', 500
+        respuesta = {'mensaje': f'Error al agregar el evento: {str(e)}'}
+        return jsonify(respuesta), 500
+    
+    
+# Ruta para obtener un evento por su ID
+@app.route('/events/<int:event_id>', methods=['GET'])
+def get_event_by_id(event_id):
+    try:
+        evento = db.session.query(Evento).get(event_id)
+
+        if evento:
+            evento_json = {
+                'id': evento.id,
+                'tipo_evento': evento.tipo_evento,
+                'descripcion': evento.descripcion,
+                'fecha': evento.fecha.isoformat(),
+                'estado': evento.estado,
+                'campo_adicional_1': evento.campo_adicional_1,
+                'campo_adicional_2': evento.campo_adicional_2
+            }
+            return jsonify(evento_json), 200
+        else:
+            return jsonify({'mensaje': 'Evento no encontrado'}), 404
+    except Exception as e:
+        return jsonify({'mensaje': f'Error al obtener el evento: {str(e)}'}), 500
+
 
 @app.route('/events/<int:event_id>', methods=['PUT'])
 def update_event(event_id):
