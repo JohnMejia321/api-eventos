@@ -139,17 +139,30 @@ def get_event_by_id(event_id):
         return jsonify({'mensaje': f'Error al obtener el evento: {str(e)}'}), 500
 
 
+# Ruta para editar un evento por su ID
 @app.route('/events/<int:event_id>', methods=['PUT'])
 def update_event(event_id):
-    event = next((event for event in events if event['id'] == event_id), None)
-    if not event:
-        return "Evento no encontrado", 404
-    data = request.get_json()
-    event['tipo_evento'] = data.get('tipo_evento')
-    event['descripcion'] = data.get('descripcion')
-    event['fecha'] = data.get('fecha')
-    event['estado'] = data.get('estado')
-    return jsonify(event), 200
+    try:
+        data = request.get_json()
+        evento = db.session.query(Evento).get(event_id)
+
+        if not evento:
+            return jsonify({'mensaje': 'Evento no encontrado'}), 404
+
+        evento.tipo_evento = data.get('tipo_evento')
+        evento.descripcion = data.get('descripcion')
+        evento.fecha = data.get('fecha')
+        evento.estado = data.get('estado')
+        evento.campo_adicional_1 = data.get('campo_adicional_1')
+        evento.campo_adicional_2 = data.get('campo_adicional_2')
+
+        db.session.commit()
+
+        respuesta = {'mensaje': 'Evento actualizado exitosamente'}
+        return jsonify(respuesta), 200
+    except Exception as e:
+        respuesta = {'mensaje': f'Error al editar el evento: {str(e)}'}
+        return jsonify(respuesta), 500
 
 @app.route('/events/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
