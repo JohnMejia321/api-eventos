@@ -164,13 +164,23 @@ def update_event(event_id):
         respuesta = {'mensaje': f'Error al editar el evento: {str(e)}'}
         return jsonify(respuesta), 500
 
+# Ruta para eliminar un evento por su ID
 @app.route('/events/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
-    event = next((event for event in events if event['id'] == event_id), None)
-    if not event:
-        return "Evento no encontrado", 404
-    events.remove(event)
-    return "", 204
+    try:
+        evento = db.session.query(Evento).get(event_id)
+
+        if not evento:
+            return jsonify({'mensaje': 'Evento no encontrado'}), 404
+
+        db.session.delete(evento)
+        db.session.commit()
+
+        respuesta = {'mensaje': 'Evento eliminado exitosamente'}
+        return jsonify(respuesta), 204  # 204 significa "No Content" para indicar que la eliminación fue exitosa
+    except Exception as e:
+        respuesta = {'mensaje': f'Error al eliminar el evento: {str(e)}'}
+        return jsonify(respuesta), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
