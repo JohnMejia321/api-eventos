@@ -2,10 +2,57 @@ from flask import Flask, request, jsonify
 from conexion import db,app  # Importa 'db' desde 'conexion.py'
 from modelo import Evento  # Importa el modelo Evento
 from sqlalchemy.exc import NoSuchTableError
+from datetime import date
+from sqlalchemy import create_engine
+from sqlalchemy import text
+from flask_swagger_ui import get_swaggerui_blueprint
 
 
-# Lista de eventos de ejemplo (simulación de base de datos)
-events = []
+db_uri = "postgresql://postgres:fredy555@localhost/eventos"
+
+
+
+SWAGGER_URL = '/api/docs'  # La URL donde se servirá la documentación Swagger
+API_URL = '/static/swagger.json'  # La URL de la especificación Swagger JSON
+
+# Crea una instancia de SwaggerUI y especifica las rutas
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,  # La URL de Swagger UI
+    API_URL,
+    config={  # Configuración de Swagger UI
+        'app_name': "Mi API"  # Nombre de tu API
+    }
+)
+
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+
+
+
+def load_initial_records(engine):
+    with engine.connect() as connection:
+        # Verifica si ya hay registros en la tabla "evento"
+        query = text("SELECT COUNT(*) FROM evento")
+        count = connection.execute(query).scalar()
+
+        if count == 0:
+            # Si no hay registros, carga los datos iniciales desde el archivo SQL
+            with open("data.sql") as sql_file:
+                sql_statements = sql_file.read()
+                connection.execute(text(sql_statements))
+            print("Registros iniciales insertados en la base de datos.")
+        else:
+            print("La base de datos ya contiene registros, no se insertaron registros iniciales.")
+
+
+
+# Llama a la función con la URL de tu base de datos
+
+
+engine = create_engine(db_uri)
+load_initial_records(engine)
+
+
 
 # Define una ruta para crear la tabla y algunos registros automáticamente
 @app.route('/crear_tabla_y_registros', methods=['GET'])
@@ -45,6 +92,9 @@ def verificar_conexion_db():
             return True
     except Exception as e:
         return str(e)
+    
+    
+
 
 # Ruta para verificar la conexión a la base de datos
 @app.route('/verificar_conexion_db')

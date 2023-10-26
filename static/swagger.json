@@ -1,0 +1,233 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "",
+      "version": "1.0.0",
+      "title": "API REST para registro de eventos",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "tags": [
+      {
+        "name": "Eventos",
+        "description": "API para gestionar eventos"
+      }
+    ],
+    "paths": {
+      "/events": {
+        "get": {
+          "tags": ["Eventos"],
+          "summary": "Obtener eventos",
+          "responses": {
+            "200": {
+              "description": "Éxito",
+              "schema": {
+                "$ref": "#/components/schemas/Eventos"
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": ["Eventos"],
+          "summary": "Crear un nuevo evento",
+          "requestBody": {
+            "description": "Objeto de creación de evento",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventoCreacion"
+                }
+              }
+            }
+          },
+          "produces": ["application/json"],
+          "responses": {
+            "201": {
+              "description": "Éxito",
+              "schema": {
+                "$ref": "#/components/schemas/ID"
+              }
+            },
+            "400": {
+              "description": "Error. Datos de creación incorrectos."
+            }
+          }
+        }
+      },
+      "/events/{id}": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID del evento que se desea consultar",
+            "type": "integer"
+          }
+        ],
+        "get": {
+          "tags": ["Eventos"],
+          "summary": "Obtener un evento por su ID",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "description": "ID del evento",
+              "schema": {
+                "$ref": "#/components/schemas/ID"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Éxito",
+              "schema": {
+                "$ref": "#/components/schemas/Evento"
+              }
+            },
+            "400": {
+              "description": "Error. Solicitud incorrecta."
+            },
+            "404": {
+              "description": "Error. Evento no encontrado."
+            }
+          }
+        },
+        "put": {
+          "summary": "Editar un evento por su ID",
+          "tags": ["Eventos"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "description": "ID del evento",
+              "schema": {
+                "$ref": "#/components/schemas/ID"
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "Objeto de evento",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evento"
+                }
+              }
+            }
+          },
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Éxito",
+              "schema": {
+                "$ref": "#/components/schemas/Evento"
+              }
+            },
+            "400": {
+              "description": "Error. Datos incorrectos."
+            }
+          }
+        },
+        "delete": {
+          "summary": "Eliminar un evento por su ID",
+          "tags": ["Eventos"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "description": "ID del evento",
+              "schema": {
+                "$ref": "#/components/schemas/ID"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Éxito",
+              "schema": {
+                "$ref": "#/components/schemas/ID"
+              }
+            },
+            "400": {
+              "description": "Error. Solicitud incorrecta."
+            },
+            "404": {
+              "description": "Error. Evento no encontrado."
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "ID": {
+          "properties": {
+            "id": {
+              "type": "integer"
+            }
+          }
+        },
+        "EventoCreacion": {
+          "type": "object",
+          "properties": {
+            "tipo_evento": {
+              "type": "string"
+            },
+            "descripcion": {
+              "type": "string"
+            },
+            "fecha": {
+              "type": "string",
+              "format": "date"
+            },
+            "estado": {
+              "type": "string"
+            }
+          }
+        },
+        "Evento": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "tipo_evento": {
+              "type": "string"
+            },
+            "descripcion": {
+              "type": "string"
+            },
+            "fecha": {
+              "type": "string",
+              "format": "date"
+            },
+            "estado": {
+              "type": "string"
+            }
+          }
+        },
+        "Eventos": {
+          "type": "object",
+          "properties": {
+            "eventos": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Evento"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+
+
+      
