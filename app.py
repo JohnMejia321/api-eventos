@@ -6,6 +6,7 @@ from datetime import date
 from sqlalchemy import create_engine
 from sqlalchemy import text
 from flask_swagger_ui import get_swaggerui_blueprint
+import psycopg2
 
 
 db_uri = "postgresql://postgres:fredy555@localhost/eventos"
@@ -20,11 +21,53 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,  # La URL de Swagger UI
     API_URL,
     config={  # Configuración de Swagger UI
-        'app_name': "Mi API"  # Nombre de tu API
+        'app_name': "Mi API"  
     }
 )
 
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+
+
+
+
+db_params = {
+    'dbname': 'eventos',     # Nombre de la base de datos
+    'user': 'postgres',      # Usuario de PostgreSQL
+    'password': 'fredy555',  # Contraseña
+    'host': 'localhost',     # Host donde se encuentra la base de datos
+    'port': '5432'           # Puerto de PostgreSQL
+}
+
+# Establecer la conexión a la base de datos
+db_connection = psycopg2.connect(**db_params)
+
+# Crear la tabla "evento" si no existe
+with db_connection.cursor() as cursor:
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS evento (
+            id SERIAL PRIMARY KEY,
+            tipo_evento VARCHAR(50),
+            descripcion TEXT,
+            fecha DATE,
+            estado VARCHAR(20),
+            campo_adicional_1 VARCHAR(50),
+            campo_adicional_2 VARCHAR(50)
+        )
+    ''')
+
+# Agregar registros por defecto si la tabla está vacía
+with db_connection.cursor() as cursor:
+    cursor.execute('SELECT COUNT(*) FROM evento')
+    count = cursor.fetchone()[0]
+    if count == 0:
+        cursor.execute('''
+            INSERT INTO evento (tipo_evento, descripcion, fecha, estado, campo_adicional_1, campo_adicional_2) VALUES
+            ('Evento tipo 1', 'Descripción 1', '2023-10-24', 'Revisado', 'Campo 1 Valor', 'Campo 2 Valor'),
+            ('Evento tipo 2', 'Descripción 2', '2023-10-25', 'Pendiente', 'Campo 1 Valor', 'Campo 2 Valor'),
+            ('Evento tipo 3', 'Descripción 3', '2023-10-26', 'Revisado', 'Campo 1 Valor', 'Campo 2 Valor')
+        ''')
+    db_connection.commit()
 
 
 

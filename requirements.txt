@@ -7,7 +7,6 @@ flask==3.0.0
 Flask-RESTful==0.3.10
 flask-restplus==0.13.0
 flask-sqlalchemy==3.1.1
-flask-swagger-ui==4.11.1
 greenlet==3.0.0
 importlib-metadata==6.8.0
 importlib-resources==6.1.0
@@ -25,4 +24,5 @@ six==1.16.0
 SQLAlchemy==2.0.22
 typing-extensions==4.8.0
 werkzeug==3.0.0
+flask-swagger-ui
 
