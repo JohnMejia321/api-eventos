@@ -52,7 +52,7 @@ Esta guía te ayudará a configurar y ejecutar una API Flask en tu entorno local
 
 
 1. **Endpoints Swagger:** Desde el endpoint http://localhost:5000/api/docs/  se puede revisar la documentación de la api
-y ejecutas las distintaciones peticiones http.
+y ejecutas las distintas peticiones http.
 
 
 ## Paso 4: DOCKERFILE
