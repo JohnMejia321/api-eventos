@@ -3,8 +3,6 @@ from conexion import db,app  # Importa 'db' desde 'conexion.py'
 from modelo import Evento  # Importa el modelo Evento
 from sqlalchemy.exc import NoSuchTableError
 from datetime import date
-from sqlalchemy import create_engine
-from sqlalchemy import text
 from flask_swagger_ui import get_swaggerui_blueprint
 import psycopg2
 
@@ -72,60 +70,10 @@ with db_connection.cursor() as cursor:
 
 
 
-def load_initial_records(engine):
-    with engine.connect() as connection:
-        # Verifica si ya hay registros en la tabla "evento"
-        query = text("SELECT COUNT(*) FROM evento")
-        count = connection.execute(query).scalar()
-
-        if count == 0:
-            # Si no hay registros, carga los datos iniciales desde el archivo SQL
-            with open("data.sql") as sql_file:
-                sql_statements = sql_file.read()
-                connection.execute(text(sql_statements))
-            print("Registros iniciales insertados en la base de datos.")
-        else:
-            print("La base de datos ya contiene registros, no se insertaron registros iniciales.")
 
 
 
-# Llama a la función con la URL de tu base de datos
 
-
-engine = create_engine(db_uri)
-load_initial_records(engine)
-
-
-
-# Define una ruta para crear la tabla y algunos registros automáticamente
-@app.route('/crear_tabla_y_registros', methods=['GET'])
-def crear_tabla_y_registros():
-    try:
-        # Intenta acceder a la tabla, esto lanzará una excepción si la tabla no existe
-        db.session.query(Evento).first()
-        tabla_existe = True
-    except NoSuchTableError:
-        tabla_existe = False
-
-    if not tabla_existe:
-        # Si la tabla no existe, crea la tabla
-        with app.app_context():
-            db.create_all()
-
-            # Agrega algunos eventos de ejemplo a la tabla
-            eventos_ejemplo = [
-                Evento(tipo_evento='Evento tipo 1', descripcion='Descripción 1', fecha='2023-10-24', estado='Revisado'),
-                Evento(tipo_evento='Evento tipo 2', descripcion='Descripción 2', fecha='2023-10-25', estado='Pendiente'),
-                Evento(tipo_evento='Evento tipo 3', descripcion='Descripción 3', fecha='2023-10-26', estado='Revisado'),
-            ]
-
-            for evento in eventos_ejemplo:
-                db.session.add(evento)
-
-            db.session.commit()
-            return 'Tabla y registros creados automáticamente.'
-    else:
-        return "La tabla ya existe en la base de datos."
 
 
 # Función para verificar la conexión a la base de datos
@@ -150,9 +98,7 @@ def verificar_conexion():
     
     
 
-# Crea las tablas si no existen
-with app.app_context():
-    db.create_all()
+
 
 
 # ...
@@ -172,7 +118,7 @@ def get_events():
                 'descripcion': evento.descripcion,
                 'fecha': evento.fecha.isoformat(),  # Convierte la fecha a formato ISO
                 'estado': evento.estado,
-                # Agrega campos adicionales según tus necesidades
+                # Agrega campos adicionales 
                 'campo_adicional_1': evento.campo_adicional_1,
                 'campo_adicional_2': evento.campo_adicional_2,
             }
