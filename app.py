@@ -10,6 +10,8 @@ import psycopg2
 db_uri = "postgresql://postgres:fredy555@localhost/eventos"
 
 
+##1) Implementar una API con su respectivo Swagger en el lenguaje Python
+
 
 SWAGGER_URL = '/api/docs'  # La URL donde se servirá la documentación Swagger
 API_URL = '/static/swagger.json'  # La URL de la especificación Swagger JSON
@@ -24,7 +26,6 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 )
 
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
-
 
 
 
@@ -53,7 +54,8 @@ with db_connection.cursor() as cursor:
             campo_adicional_2 VARCHAR(50)
         )
     ''')
-
+    
+##2.  El código debe generar de manera automática algunos eventos de ejemplo en una base de datos PostgreSQL.
 # Agregar registros por defecto si la tabla está vacía
 with db_connection.cursor() as cursor:
     cursor.execute('SELECT COUNT(*) FROM evento')
